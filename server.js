@@ -1,5 +1,4 @@
 const express = require('express');
-const path = require('path');
 const cookieSession = require('cookie-session');
 const csurf = require('csurf');
 const secrets = require('./secrets.json');
@@ -13,7 +12,8 @@ app.set('view engine', 'handlebars');
 // Logging middleware
 app.use(morgan('tiny'));
 // open sources
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static('./public'));
+// app.use(express.static(path.join(__dirname, 'public')));
 // body-parser
 app.use(express.urlencoded({ extended: false }));
 // cookie handlers
