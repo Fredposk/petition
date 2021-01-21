@@ -61,7 +61,7 @@ app.post('/petition', async (req, res) => {
     }
 });
 
-// request to view all signers
+// SIGNERS Page
 app.get('/signers', async (req, res) => {
     if (req.session.signatureId) {
         try {
@@ -88,12 +88,12 @@ app.get('/thanks', async (req, res) => {
         try {
             const [signature, result, total] = await Promise.all([
                 db.getSignature(req.session.signatureId),
-                db.getSigners(),
+                db.getSignee(req.session.signatureId),
                 db.viewTotal(),
             ]);
             res.render('thanks', {
                 title: 'Thank You',
-                result: result.rows,
+                result: result.rows[0],
                 total: total.rows[0].count,
                 signature: signature.rows[0].signature,
             });

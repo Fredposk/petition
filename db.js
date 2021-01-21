@@ -21,3 +21,8 @@ module.exports.getSignature = (cookieID) => {
         `SELECT signature FROM signatures WHERE contact_id = '${cookieID}'`
     );
 };
+module.exports.getSignee = (cookieID) => {
+    return db.query(
+        `SELECT * FROM signatures WHERE contact_id = '${cookieID}'`
+    );
+};
