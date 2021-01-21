@@ -16,13 +16,8 @@ module.exports.viewTotal = () => {
     return db.query('SELECT COUNT(*) FROM signatures');
 };
 
-module.exports.getSignature = (cookieID) => {
-    return db.query(
-        `SELECT signature FROM signatures WHERE contact_id = '${cookieID}'`
-    );
-};
 module.exports.getSignee = (cookieID) => {
-    return db.query(
-        `SELECT * FROM signatures WHERE contact_id = '${cookieID}'`
-    );
+    const q = `SELECT * FROM signatures WHERE contact_id = $1`;
+    const params = [cookieID];
+    return db.query(q, params);
 };

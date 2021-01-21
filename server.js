@@ -86,8 +86,7 @@ app.get('/signers', async (req, res) => {
 app.get('/thanks', async (req, res) => {
     if (req.session.signatureId) {
         try {
-            const [signature, result, total] = await Promise.all([
-                db.getSignature(req.session.signatureId),
+            const [result, total] = await Promise.all([
                 db.getSignee(req.session.signatureId),
                 db.viewTotal(),
             ]);
@@ -95,7 +94,7 @@ app.get('/thanks', async (req, res) => {
                 title: 'Thank You',
                 result: result.rows[0],
                 total: total.rows[0].count,
-                signature: signature.rows[0].signature,
+                // signature: signature.rows[0].signature,
             });
         } catch (error) {
             // Make an error page 404 etc
