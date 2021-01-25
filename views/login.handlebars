@@ -1,0 +1,32 @@
+
+
+<form method="post">
+ <label for="fname" class="text-gray-900">Email</label><br>
+  <input class="formElement" type="email" id="email" name="email"><br>
+  <label  for="password" class="text-gray-900">Password</label><br>
+  <input class="formElement" type="password" id="password" name="password"><br>
+  <button class="px-2 py-1 mt-3 text-sm tracking-wide text-gray-300 uppercase transition duration-500 bg-gray-500 border-2 border-gray-500 rounded shadow hover:bg-gray-700 hover:shadow-2xl hover:text-gray-400"
+ type="submit">Login <i class="fas fa-sign-in-alt"></i
+     ></button>
+   <input type="hidden" name="_csrf" value="{{csrfToken}}">
+</form>
+
+
+
+{{#if hasPwErrors}}
+<div class="flex flex-col justify-center mt-12">
+  <ul class="errorEl">
+    <li>{{errors}}</li>
+{{/if}}
+
+
+{{#if hasUserErrors}}
+ <div class="flex flex-col justify-center mt-12">
+  <ul class="errorEl">
+    <li>{{errors}}</li>
+{{/if}}
+  </ul>
+</div>
+
+<img src="/Illustration.svg" >
+</div>

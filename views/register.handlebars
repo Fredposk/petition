@@ -1,0 +1,40 @@
+
+
+
+<form method="post" >
+  <label for="fname" >First name:</label><br>
+  <input  type="text" class="formElement" id="fname" name="firstName"><br>
+  <label for="lname">Last Name:</label><br>
+  <input  type="text" class="formElement" id="lname" name="lastName"> <br>
+    <label for="email">Email:</label><br>
+  <input class="formElement" type="email" id="email" name="email"><br>
+  <label for="password">Password:</label><br>
+  <input placeholder="min. 6 characters" class="formElement" type="password" id="password" name="password"> <br>
+   <input type="hidden" name="_csrf" value="{{csrfToken}}">
+
+<br>
+
+
+<button type="submit" class="px-2 py-1 mt-3 text-sm tracking-wide text-gray-300 uppercase transition duration-500 bg-gray-500 border-2 border-gray-500 rounded shadow hover:bg-gray-700 hover:shadow-2xl hover:text-gray-400"
+>Register</button>
+</form>
+{{!-- Error handling due to user input --}}
+{{#if hasErrors}}
+<div class="flex flex-col justify-center mt-12">
+  <ul class="errorEl">
+{{#each errors}}
+    <li>{{this.msg}}</li>
+{{/each}}
+{{/if}}
+{{!-- Error handling due to database --}}
+{{#if hasDBError}}
+<div class="flex flex-col justify-center mt-12">
+  <ul class="errorEl">
+    <li>{{errors}}</li>
+{{/if}}
+  </ul>
+</div>
+<img src="/Illustration.svg" >
+</div>
+
+

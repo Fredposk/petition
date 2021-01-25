@@ -1,8 +1,11 @@
+<h1>SIGN THIS PET</h1>
+
+
 <form method="post" id="form">
-  <label for="fname">First name:</label><br>
+  {{!-- <label for="fname">First name:</label><br>
   <input type="text" id="fname" name="firstName"><br>
   <label for="lname">Last name:</label><br>
-  <input type="text" id="lname" name="lastName">
+  <input type="text" id="lname" name="lastName"> --}}
   <label for="lname">Signature</label><br>
   <canvas style="background-color: blue" id="canvasSig" width="200" height="100"></canvas>
   <input type="hidden" id="signature" name="signature" value="">
@@ -11,3 +14,24 @@
 </form>
 <button id="clearBtn">Click to clear</button>
 <script src="/script.js"></script>
+
+
+{{#if hasUserSigErrors}}
+<div class="flex flex-col justify-center mt-12">
+  <ul class="errorEl">
+{{#each errors}}
+    <li>{{this.msg}}</li>
+{{/each}}
+{{/if}}
+
+
+{{#if hasDBErrors}}
+ <div class="flex flex-col justify-center mt-12">
+  <ul class="errorEl">
+    <li>{{errors}}</li>
+{{/if}}
+  </ul>
+</div>
+
+<img src="/Illustration.svg" >
+</div>

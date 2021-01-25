@@ -1,19 +1,31 @@
 const express = require('express');
+const app = express();
 const cookieSession = require('cookie-session');
 const csurf = require('csurf');
+const helmet = require('helmet');
 const secrets = require('./secrets.json');
-const app = express();
 const morgan = require('morgan');
+const { v4: uuidv4 } = require('uuid');
 const db = require('./db');
+const bcrypt = require('bcryptjs');
+const { compare } = bcrypt;
+// validator
+const { check, validationResult } = require('express-validator');
 // Rendering middleware
 const exphbs = require('express-handlebars');
 app.engine('handlebars', exphbs());
 app.set('view engine', 'handlebars');
 // Logging middleware
-app.use(morgan('tiny'));
+app.use(morgan('dev'));
+// Security middleware
+app.use(
+    helmet({
+        contentSecurityPolicy: false,
+    })
+);
 // open sources
 app.use(express.static('./public'));
-// app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static('./dist'));
 // body-parser
 app.use(express.urlencoded({ extended: false }));
 // cookie handlers
@@ -36,73 +48,273 @@ app.use((req, res, next) => {
     res.setHeader('x-frame-options', 'deny');
     next();
 });
-
-// Main homepage will check cookies if none then present petition
-app.get('/petition', (req, res) => {
-    if (!req.session.signatureId) {
-        res.render('petition', {
-            title: 'petition',
+// THIS IS HOME
+app.get('/', (req, res) => {
+    // WILL CHECK IF LOGGED OR NOT
+    res.render('home', { title: 'Home' });
+});
+// This is the login page
+app.get('/login', (req, res) => {
+    if (!req.session.userID) {
+        res.render('login', {
+            title: 'login',
         });
     } else {
-        res.redirect('/thanks');
+        res.redirect('/petition');
     }
 });
-
-// POST to database
-app.post('/petition', async (req, res) => {
+// This is post on the login Page
+app.post('/login', async (req, res) => {
+    const { email, password } = req.body;
     try {
-        const { firstName, lastName, signature } = req.body;
-        const returnId = await db.addSigner(firstName, lastName, signature);
-        req.session.signatureId = returnId.rows[0].contact_id;
-        res.redirect('/thanks');
-    } catch (e) {
-        // IF the db insert fails (i.e. your promise from the db query gets rejected), rerender petition.handlebars and pass an indication that there should be an error message shown to the template
-        console.log('error at post');
+        const AttemptLog = await db.logAttempt(email);
+        const match = await compare(password, AttemptLog.rows[0].password);
+        if (match) {
+            req.session.userID = AttemptLog.rows[0].user_id;
+            res.redirect('/petition');
+        } else {
+            console.log(match);
+            res.render('login', {
+                title: 'title',
+                hasPwErrors: true,
+                errors: 'Check your password and try again',
+            });
+        }
+    } catch (error) {
+        res.render('login', {
+            title: 'title',
+            hasUserErrors: true,
+            errors: 'check email address is correct',
+        });
+    }
+});
+// This is the register page
+app.get('/register', (req, res) => {
+    if (!req.session.userID) {
+        res.render('register', { title: 'Register' });
+    } else {
+        res.redirect('/petition');
+    }
+});
+// this is the register post
+app.post(
+    '/register',
+    [
+        check('firstName', 'You must enter a first name').notEmpty(),
+        check('lastName', 'You must enter a last name').notEmpty(),
+        check('email', 'Make sure this is a valid email')
+            .notEmpty()
+            .normalizeEmail(),
+        check('password', 'Check password is more than 6 characters').isLength(
+            '6'
+        ),
+    ],
+    async (req, res) => {
+        // This is error handling during Registration
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            res.render('register', {
+                title: 'Register',
+                hasErrors: true,
+                errors: errors.array(),
+            });
+        } else {
+            const { firstName, lastName, email } = req.body;
+            const salt = await bcrypt.genSalt(10);
+            const password = await bcrypt.hash(req.body.password, salt);
+            try {
+                const userID = await db.newUser(
+                    firstName,
+                    lastName,
+                    email,
+                    password
+                );
+                req.session.userID = userID.rows[0].user_id;
+                res.redirect('/profile');
+            } catch (error) {
+                res.render('register', {
+                    title: 'Register',
+                    hasDBError: true,
+                    errors:
+                        'We are having some technical problems, try again later',
+                });
+            }
+        }
+    }
+);
+
+app.get('/profile', (req, res) => {
+    if (!req.session.userID) {
+        res.redirect('/register');
+    } else {
+        res.render('profile', {
+            layout: 'logged',
+            title: 'Profile',
+        });
     }
 });
 
+// This is the Post user profile page
+app.post(
+    '/profile',
+    [check('url', 'Make sure this is a valid URL').isURL()],
+    async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            res.render('profile', {
+                layout: 'logged',
+                title: 'Profile',
+                hasErrors: true,
+                errors: errors.array(),
+            });
+        } else {
+            try {
+                const userId = req.session.userID;
+                const { city, age, url } = req.body;
+
+                console.log(age, url, userId);
+                console.log(city);
+
+                res.status(200);
+                // await db.addUserDetails(city, age, url, userId);
+                // This will make a database request then redirect to petition
+                // res.redirect('/petition');
+            } catch (error) {
+                console.log('db error');
+            }
+        }
+    }
+);
+
+// Will check if the user has signed or not
+app.get('/petition', async (req, res) => {
+    if (!req.session.userID) {
+        res.redirect('/register');
+    } else {
+        const signed = await db.checkSignature(req.session.userID);
+        if (signed.rows.length !== 0) {
+            res.redirect('/thanks');
+        } else res.render('petition', { layout: 'logged', title: 'Petition' });
+    }
+});
+// still allowing empty signature field
+app.post(
+    '/petition',
+    [
+        check('signature', 'Field must be fully signed before moving on')
+            .isDataURI()
+            .isLength('722'),
+    ],
+    async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            res.render('petition', {
+                layout: 'logged',
+                hasUserSigErrors: true,
+                errors: errors.array(),
+            });
+        } else {
+            try {
+                const { signature } = req.body;
+                const userId = req.session.userID;
+                await db.addSigner(userId, signature);
+                res.redirect('/thanks');
+            } catch (error) {
+                res.render('petition', {
+                    layout: 'logged',
+                    title: 'Petition',
+                    hasDBErrors: true,
+                    errors:
+                        'We are having some technical problems, try again later',
+                });
+            }
+        }
+    }
+);
 // SIGNERS Page
+// app.get('/signers', async (req, res) => {
+//     if (req.session.signatureId) {
+//         try {
+//             const [result, total] = await Promise.all([
+//                 db.getSigners(),
+//                 db.viewTotal(),
+//             ]);
+//             res.render('signers', {
+//                 title: 'signers',
+//                 result: result.rows,
+//                 total: total,
+//             });
+//         } catch (error) {
+//             // Make an error page 404 etc
+//             console.log('error during db request');
+//         }
+//     } else {
+//         res.redirect('/petition');
+//     }
+// });
+
 app.get('/signers', async (req, res) => {
-    if (req.session.signatureId) {
-        try {
+    try {
+        const signed = await db.checkSignature(req.session.userID);
+        if (req.session.userID && signed.rows.length !== 0) {
             const [result, total] = await Promise.all([
                 db.getSigners(),
                 db.viewTotal(),
             ]);
             res.render('signers', {
-                title: 'signers',
+                title: 'Signers',
                 result: result.rows,
                 total: total,
             });
-        } catch (error) {
-            // Make an error page 404 etc
-            console.log('error during db request');
+        } else {
+            res.redirect('/petition');
         }
-    } else {
-        res.redirect('/petition');
+    } catch (error) {
+        console.log('error with signers page');
+        res.redirect('/');
     }
 });
+
 // THANK YOU RENDER
 app.get('/thanks', async (req, res) => {
-    if (req.session.signatureId) {
-        try {
-            const [result, total] = await Promise.all([
-                db.getSignee(req.session.signatureId),
-                db.viewTotal(),
-            ]);
-            res.render('thanks', {
-                title: 'Thank You',
-                result: result.rows[0],
-                total: total.rows[0].count,
-                // signature: signature.rows[0].signature,
-            });
-        } catch (error) {
-            // Make an error page 404 etc
-            console.log('error during thanks DB request');
+    if (req.session.userID) {
+        const signed = await db.checkSignature(req.session.userID);
+        if (signed.rows.length === 0) {
+            res.redirect('/petition');
+        } else {
+            try {
+                const [result, total, user] = await Promise.all([
+                    db.getSignee(req.session.userID),
+                    db.viewTotal(),
+                    db.userDetails(req.session.userID),
+                ]);
+                res.render('thanks', {
+                    layout: 'logged',
+                    title: 'Thank You',
+                    result: result.rows[0],
+                    total: total.rows[0].count,
+                    user: user.rows[0],
+                });
+            } catch (error) {
+                // Make an error page 404 etc
+                console.log('error during thanks DB request');
+            }
         }
     } else {
-        res.redirect('/petition');
+        res.redirect('/register');
     }
+});
+
+app.get('/account', async (req, res) => {
+    res.render('account', { layout: 'logged', title: 'Account' });
+});
+// This is the log out process
+app.get('/logout', (req, res) => {
+    req.session.userID = uuidv4();
+    req.session = null;
+    setTimeout(() => {
+        res.redirect('/');
+    }, 1000);
 });
 
 // Server
