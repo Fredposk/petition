@@ -2,7 +2,10 @@ const spicedPg = require('spiced-pg');
 const db = spicedPg('postgres:postgres:postgres@localhost:5432/petition');
 
 module.exports.getSigners = () => {
-    return db.query('SELECT * FROM signatures');
+    return db.query(`SELECT users.first, users.last, user_profiles.age, user_profiles.city, user_profiles.url
+FROM users
+LEFT JOIN signatures ON users.user_id = signatures.user_id
+LEFT JOIN user_profiles ON signatures.user_id = user_profiles.user_id`);
 };
 
 module.exports.addSigner = (userID, signature) => {
@@ -46,4 +49,22 @@ module.exports.userDetails = (userId) => {
     return db.query(q, params);
 };
 
-// insert into user_profiles (age, city, url, user_id) values (29, 'Berlin', 'banana.com', '18d504b4-70cb-4355-8525-71b41a425831');
+module.exports.UserAccountDetails = (userID) => {
+    const q = `SELECT *
+FROM users
+RIGHT OUTER JOIN signatures ON users.user_id = signatures.user_id
+RIGHT OUTER JOIN user_profiles ON signatures.user_id = user_profiles.user_id
+WHERE users.user_id = $1`;
+    const params = [userID];
+    return db.query(q, params);
+};
+
+module.exports.filterByCity = (city) => {
+    const q = `SELECT users.first, users.last, user_profiles.age, user_profiles.url
+FROM  users
+LEFT JOIN signatures ON users.user_id = signatures.user_id
+LEFT JOIN user_profiles ON signatures.user_id = user_profiles.user_id
+WHERE LOWER(user_profiles.city) = LOWER($1)`;
+    const params = [city];
+    return db.query(q, params);
+};

@@ -1,20 +1,24 @@
+<h1>Results for: {{location}}</h1>
+
+
 
 <table class="bg-gray-200">
     <tr>
         <td>First Name</td>
         <td>Last Name</td>
-        <td>City</td>
         <td>Age</td>
     </tr>
 {{#each result}}
     <tr>
         <td>{{this.first}}</td>
         <td>{{this.last}}</td>
-        <td>{{this.city}}</td>
         <td>{{this.age}}</td>
     </tr>
 {{/each}}
-<p>{{total}}</p>
+
+
+
+
 
 </table>
 <img src="/Illustration.svg" >

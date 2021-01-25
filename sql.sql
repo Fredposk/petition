@@ -52,3 +52,16 @@ PRIMARY KEY (profile_id)
 
 
 insert into user_profiles (age, city, url, user_id) values (32, 'Barcelona', null ,'5dd4922f-af9c-40c9-8746-3a41782f1f09');
+
+
+SELECT           *
+FROM             users
+FULL OUTER JOIN signatures ON users.user_id = signatures.user_id
+FULL OUTER JOIN user_profiles ON signatures.user_id = user_profiles.user_id
+WHERE            users.user_id = '18d504b4-70cb-4355-8525-71b41a425831';
+
+
+SELECT users.first, users.last, user_profiles.age, user_profiles.city, user_profiles.url
+FROM  users
+LEFT JOIN signatures ON users.user_id = signatures.user_id
+LEFT  JOIN user_profiles ON signatures.user_id = user_profiles.user_id

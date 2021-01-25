@@ -231,28 +231,7 @@ app.post(
         }
     }
 );
-// SIGNERS Page
-// app.get('/signers', async (req, res) => {
-//     if (req.session.signatureId) {
-//         try {
-//             const [result, total] = await Promise.all([
-//                 db.getSigners(),
-//                 db.viewTotal(),
-//             ]);
-//             res.render('signers', {
-//                 title: 'signers',
-//                 result: result.rows,
-//                 total: total,
-//             });
-//         } catch (error) {
-//             // Make an error page 404 etc
-//             console.log('error during db request');
-//         }
-//     } else {
-//         res.redirect('/petition');
-//     }
-// });
-
+// This is the signers page
 app.get('/signers', async (req, res) => {
     try {
         const signed = await db.checkSignature(req.session.userID);
@@ -262,9 +241,10 @@ app.get('/signers', async (req, res) => {
                 db.viewTotal(),
             ]);
             res.render('signers', {
+                layout: 'logged',
                 title: 'Signers',
                 result: result.rows,
-                total: total,
+                total: total.rows[0].count,
             });
         } else {
             res.redirect('/petition');
@@ -304,9 +284,47 @@ app.get('/thanks', async (req, res) => {
         res.redirect('/register');
     }
 });
+// This will filter by city
+app.get('/signers/:city', async (req, res) => {
+    const { city } = req.params;
+    if (req.session.userID) {
+        const signed = await db.checkSignature(req.session.userID);
+        if (signed.rows.length === 0) {
+            res.redirect('/petition');
+        } else {
+            try {
+                const result = await db.filterByCity(city);
+                console.log(result.rows[0]);
+                res.render('city', {
+                    layout: 'logged',
+                    title: city,
+                    location: city,
+                    result: result.rows[0],
+                });
+            } catch (error) {
+                console.log('error getting data');
+            }
+        }
+    } else {
+        res.redirect('/petition');
+    }
+});
 
+// This wull be the user account page
 app.get('/account', async (req, res) => {
-    res.render('account', { layout: 'logged', title: 'Account' });
+    try {
+        const UserAccountDetails = await db.UserAccountDetails(
+            req.session.userID
+        );
+        console.log(UserAccountDetails.rows[0]);
+        res.render('account', {
+            layout: 'logged',
+            title: 'Account',
+            userAccountDetails: UserAccountDetails.rows[0],
+        });
+    } catch (error) {
+        console.log('error in database');
+    }
 });
 // This is the log out process
 app.get('/logout', (req, res) => {
