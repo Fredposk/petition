@@ -50,9 +50,17 @@ app.use((req, res, next) => {
 });
 // THIS IS HOME
 app.get('/', (req, res) => {
-    // WILL CHECK IF LOGGED OR NOT
-    res.render('home', { title: 'Home' });
+    req.session.userID
+        ? res.render('home', {
+              layout: 'logged',
+              loggedIn: true,
+          })
+        : res.render('home', {
+              layout: 'main',
+              loggedOut: true,
+          });
 });
+
 // This is the login page
 app.get('/login', (req, res) => {
     if (!req.session.userID) {
@@ -155,36 +163,31 @@ app.get('/profile', (req, res) => {
 });
 
 // This is the Post user profile page
-app.post(
-    '/profile',
-    [check('url', 'Make sure this is a valid URL').isURL()],
-    async (req, res) => {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
+app.post('/profile', async (req, res) => {
+    const { age, city, url } = req.body;
+    const userId = req.session.userID;
+    if (url.startsWith('https://') || url.startsWith('http://') || url === '') {
+        try {
+            await db.addUserDetails(age, city, url, userId);
+            res.redirect('/petition');
+        } catch (error) {
             res.render('profile', {
                 layout: 'logged',
                 title: 'Profile',
                 hasErrors: true,
-                errors: errors.array(),
+                errors:
+                    'We are having some technical problems, try again later',
             });
-        } else {
-            try {
-                const userId = req.session.userID;
-                const { city, age, url } = req.body;
-
-                console.log(age, url, userId);
-                console.log(city);
-
-                res.status(200);
-                // await db.addUserDetails(city, age, url, userId);
-                // This will make a database request then redirect to petition
-                // res.redirect('/petition');
-            } catch (error) {
-                console.log('db error');
-            }
         }
+    } else {
+        res.render('profile', {
+            layout: 'logged',
+            title: 'Profile',
+            hasErrors: true,
+            errors: 'Make Sure This is a valid URL',
+        });
     }
-);
+});
 
 // Will check if the user has signed or not
 app.get('/petition', async (req, res) => {
@@ -197,7 +200,7 @@ app.get('/petition', async (req, res) => {
         } else res.render('petition', { layout: 'logged', title: 'Petition' });
     }
 });
-// still allowing empty signature field
+// This is the post petition
 app.post(
     '/petition',
     [
@@ -250,8 +253,12 @@ app.get('/signers', async (req, res) => {
             res.redirect('/petition');
         }
     } catch (error) {
-        console.log('error with signers page');
-        res.redirect('/');
+        res.render('signers', {
+            layout: 'logged',
+            title: 'Signers',
+            hasDBErrors: true,
+            errors: 'We are having some technical problems, try again later',
+        });
     }
 });
 
@@ -276,8 +283,13 @@ app.get('/thanks', async (req, res) => {
                     user: user.rows[0],
                 });
             } catch (error) {
-                // Make an error page 404 etc
-                console.log('error during thanks DB request');
+                res.render('thanks', {
+                    layout: 'logged',
+                    title: 'Thank You',
+                    hasDBErrors: true,
+                    errors:
+                        'We are having some technical problems, try again later',
+                });
             }
         }
     } else {
@@ -294,22 +306,27 @@ app.get('/signers/:city', async (req, res) => {
         } else {
             try {
                 const result = await db.filterByCity(city);
-                console.log(result.rows[0]);
+                console.log(result.rows);
                 res.render('city', {
                     layout: 'logged',
                     title: city,
                     location: city,
-                    result: result.rows[0],
+                    result: result.rows,
                 });
             } catch (error) {
-                console.log('error getting data');
+                res.render('signers', {
+                    layout: 'logged',
+                    title: city,
+                    hasDBErrors: true,
+                    errors:
+                        'We are having some technical problems, try again later',
+                });
             }
         }
     } else {
         res.redirect('/petition');
     }
 });
-
 // This wull be the user account page
 app.get('/account', async (req, res) => {
     try {

@@ -31,6 +31,13 @@ module.exports.newUser = (firstName, lastName, email, password) => {
     return db.query(q, params);
 };
 
+module.exports.addUserDetails = (age, city, url, userId) => {
+    const q = `INSERT INTO user_profiles (age, city, url, user_id)
+        VALUES ($1, $2, $3, $4)`;
+    const params = [age, city, url, userId];
+    return db.query(q, params);
+};
+
 module.exports.logAttempt = (email) => {
     const q = `SELECT * FROM users WHERE email = $1`;
     const params = [email];
@@ -52,8 +59,8 @@ module.exports.userDetails = (userId) => {
 module.exports.UserAccountDetails = (userID) => {
     const q = `SELECT *
 FROM users
-RIGHT OUTER JOIN signatures ON users.user_id = signatures.user_id
-RIGHT OUTER JOIN user_profiles ON signatures.user_id = user_profiles.user_id
+LEFT JOIN signatures ON users.user_id = signatures.user_id
+LEFT JOIN user_profiles ON signatures.user_id = user_profiles.user_id
 WHERE users.user_id = $1`;
     const params = [userID];
     return db.query(q, params);

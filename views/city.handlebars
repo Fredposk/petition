@@ -10,16 +10,23 @@
     </tr>
 {{#each result}}
     <tr>
-        <td>{{this.first}}</td>
-        <td>{{this.last}}</td>
-        <td>{{this.age}}</td>
+        <td>{{first}}</td>
+        <td>{{last}}</td>
+        <td>{{age}}</td>
     </tr>
 {{/each}}
 
 
-
-
-
 </table>
+
+
+{{#if hasDBErrors}}
+ <div class="flex flex-col justify-center mt-12">
+  <ul class="errorEl">
+    <li>{{errors}}</li>
+{{/if}}
+  </ul>
+</div>
+
 <img src="/Illustration.svg" >
 </div>

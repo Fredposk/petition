@@ -1,4 +1,7 @@
 <h1>profile page</h1>
+<h2>Optional data</h2>
+
+
 
 <form method="post" >
   <label for="City" >City:</label><br>
@@ -26,9 +29,9 @@
 {{#if hasErrors}}
 <div class="flex flex-col justify-center mt-12">
   <ul class="errorEl">
-{{#each errors}}
-    <li>{{this.msg}}</li>
-{{/each}}
+
+    <li>{{errors}}</li>
+
 {{/if}}
   </ul>
 </div>
