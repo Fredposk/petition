@@ -8,6 +8,13 @@
 <a href="/signers" class="px-2 py-1 mt-3 text-sm tracking-wide text-gray-300 uppercase transition duration-500 bg-gray-500 border-2 border-gray-500 rounded shadow hover:bg-gray-700 hover:shadow-2xl hover:text-gray-400"
 >Continue</a>
 
+<form method="post">
+  <button class="warningBtn"
+ type="submit">Remove signature</button>
+   <input type="hidden" name="_csrf" value="{{csrfToken}}">
+</form>
+
+
 {{#if hasDBErrors}}
  <div class="flex flex-col justify-center mt-12">
   <ul class="errorEl">

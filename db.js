@@ -111,3 +111,9 @@ module.exports.userAccountUpdate = (
     const params = [firstName, lastName, email, password, userID];
     return db.query(q, params);
 };
+
+module.exports.deleteSignature = (userID) => {
+    const q = `DELETE FROM signatures WHERE user_id = $1`;
+    const params = [userID];
+    return db.query(q, params);
+};

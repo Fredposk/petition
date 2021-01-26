@@ -241,35 +241,7 @@ app.post(
         }
     }
 );
-// This is the signers page
-app.get('/signers', async (req, res) => {
-    try {
-        const signed = await db.checkSignature(req.session.userID);
-        if (req.session.userID && signed.rows.length !== 0) {
-            const [result, total] = await Promise.all([
-                db.getSigners(),
-                db.viewTotal(),
-            ]);
-            res.render('signers', {
-                layout: 'logged',
-                title: 'Signers',
-                result: result.rows,
-                total: total.rows[0].count,
-            });
-        } else {
-            res.redirect('/petition');
-        }
-    } catch (error) {
-        res.render('signers', {
-            layout: 'logged',
-            title: 'Signers',
-            hasDBErrors: true,
-            errors: 'We are having some technical problems, try again later',
-        });
-    }
-});
-
-// THANK YOU RENDER
+// THANK YOU Page
 app.get('/thanks', async (req, res) => {
     if (req.session.userID) {
         const signed = await db.checkSignature(req.session.userID);
@@ -303,6 +275,50 @@ app.get('/thanks', async (req, res) => {
         res.redirect('/register');
     }
 });
+
+// this is the signature deletion
+app.post('/thanks', async (req, res) => {
+    try {
+        await db.deleteSignature(req.session.userID);
+        res.redirect('/petition');
+    } catch (error) {
+        res.render('thanks', {
+            layout: 'logged',
+            title: 'thanks',
+            hasDBErrors: true,
+            errors: 'We are having some technical problems, try again later',
+        });
+    }
+});
+
+// This is the signers page
+app.get('/signers', async (req, res) => {
+    try {
+        const signed = await db.checkSignature(req.session.userID);
+        if (req.session.userID && signed.rows.length !== 0) {
+            const [result, total] = await Promise.all([
+                db.getSigners(),
+                db.viewTotal(),
+            ]);
+            res.render('signers', {
+                layout: 'logged',
+                title: 'Signers',
+                result: result.rows,
+                total: total.rows[0].count,
+            });
+        } else {
+            res.redirect('/petition');
+        }
+    } catch (error) {
+        res.render('signers', {
+            layout: 'logged',
+            title: 'Signers',
+            hasDBErrors: true,
+            errors: 'We are having some technical problems, try again later',
+        });
+    }
+});
+
 // This will filter by city
 app.get('/signers/:city', async (req, res) => {
     const { city } = req.params;
@@ -313,7 +329,6 @@ app.get('/signers/:city', async (req, res) => {
         } else {
             try {
                 const result = await db.filterByCity(city);
-                console.log(result.rows);
                 res.render('city', {
                     layout: 'logged',
                     title: city,

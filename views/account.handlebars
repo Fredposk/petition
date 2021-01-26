@@ -1,5 +1,5 @@
 
-<h1>This is the account page</h1>
+<h1>{{userAccountDetails.first}}'s account page</h1>
 
 
 
@@ -32,8 +32,10 @@
 </form>
 
 
-<a href="/delete" class="px-2 py-1 mt-3 text-sm tracking-wide text-gray-100 uppercase transition duration-500 bg-red-400 border-2 border-red-400 rounded shadow hover:bg-red-700 hover:shadow-2xl hover:text-red-400"
+<a href="/delete" class="warningBtn"
 >DELETE</a>
+<a href="/thanks" class="warningBtn"
+>DELETE Signature</a>
 
 
 {{#if isUpdated}}
