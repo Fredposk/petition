@@ -3,13 +3,14 @@ const app = express();
 const cookieSession = require('cookie-session');
 const csurf = require('csurf');
 const helmet = require('helmet');
-// const secrets = require('./secrets.json');
+// deployed to heroku
 let secrets;
 if (process.env.cookie_secret) {
     secrets = process.env.cookie_secret;
 } else {
     secrets = require('./secrets.json');
 }
+//
 const morgan = require('morgan');
 const { v4: uuidv4 } = require('uuid');
 const db = require('./db');
@@ -54,8 +55,10 @@ app.use((req, res, next) => {
     res.setHeader('x-frame-options', 'deny');
     next();
 });
+
 // THIS IS HOME
 app.get('/', (req, res) => {
+    req.csrfToken();
     req.session.userID
         ? res.render('home', {
               layout: 'logged',
