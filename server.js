@@ -45,11 +45,11 @@ app.use(
     })
 );
 // CSURF protection
-app.use(csurf());
 app.use(function (req, res, next) {
     res.locals.csrfToken = req.csrfToken();
     next();
 });
+app.use(csurf());
 // Click jacking protection
 app.use((req, res, next) => {
     res.setHeader('x-frame-options', 'deny');
@@ -58,7 +58,6 @@ app.use((req, res, next) => {
 
 // THIS IS HOME
 app.get('/', (req, res) => {
-    req.csrfToken();
     req.session.userID
         ? res.render('home', {
               layout: 'logged',
