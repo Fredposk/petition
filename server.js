@@ -158,7 +158,7 @@ app.post(
         }
     }
 );
-
+// This is the get request for profile
 app.get('/profile', (req, res) => {
     if (!req.session.userID) {
         res.redirect('/register');
@@ -169,7 +169,6 @@ app.get('/profile', (req, res) => {
         });
     }
 });
-
 // This is the Post user profile page
 app.post('/profile', async (req, res) => {
     const { age, city, url } = req.body;
@@ -197,7 +196,6 @@ app.post('/profile', async (req, res) => {
         });
     }
 });
-
 // Will check if the user has signed or not
 app.get('/petition', async (req, res) => {
     if (!req.session.userID) {
@@ -342,7 +340,6 @@ app.get('/account', async (req, res) => {
         const UserAccountDetails = await db.UserAccountDetails(
             req.session.userID
         );
-        console.log(UserAccountDetails.rows[0]);
         res.render('account', {
             layout: 'logged',
             title: 'Account',
@@ -357,6 +354,76 @@ app.get('/account', async (req, res) => {
         });
     }
 });
+// This is the post for account update
+app.post('/account', async (req, res) => {
+    const userID = req.session.userID;
+    try {
+        let { firstName, lastName, email, password, age, city, url } = req.body;
+        if (
+            url.startsWith('https://') ||
+            url.startsWith('http://') ||
+            url === ''
+        ) {
+            // console.log(firstName, lastName, email, password, age, city, url);
+            if (password === '') {
+                console.log('didnt change password');
+
+                const UserAccountDetails = await db.UserAccountDetails(userID);
+                password = UserAccountDetails.rows[0].password;
+                Promise.all([
+                    db.userProfileUpdate(age, city, url, userID),
+                    db.userAccountUpdate(
+                        firstName,
+                        lastName,
+                        email,
+                        password,
+                        userID
+                    ),
+                ]);
+            } else {
+                console.log('password changed');
+                const userID = req.session.userID;
+                const salt = await bcrypt.genSalt(10);
+                const hashPassword = await bcrypt.hash(password, salt);
+                Promise.all([
+                    db.userProfileUpdate(age, city, url, userID),
+                    db.userAccountUpdate(
+                        firstName,
+                        lastName,
+                        email,
+                        hashPassword,
+                        userID
+                    ),
+                ]);
+            }
+        } else {
+            // This whole block is not logging, url error is on catch
+            // res.render('account', {
+            //     layout: 'logged',
+            //     isUpdated: true,
+            //     updateMsg: 'Make sure this is a valid URL',
+            //     userAccountDetails: UserAccountDetails.rows[0],
+            // });
+        }
+        const UserAccountDetails = await db.UserAccountDetails(userID);
+        res.render('account', {
+            layout: 'logged',
+            isUpdated: true,
+            updateMsg: 'User Details have been updated',
+            userAccountDetails: UserAccountDetails.rows[0],
+        });
+    } catch (error) {
+        const UserAccountDetails = await db.UserAccountDetails(userID);
+        res.render('account', {
+            layout: 'logged',
+            title: 'Account',
+            isUpdated: true,
+            userAccountDetails: UserAccountDetails.rows[0],
+            updateMsg: 'We are having some technical problems, try again later',
+        });
+    }
+});
+
 // This is the log out process
 app.get('/logout', (req, res) => {
     req.session.userID = uuidv4();
@@ -371,21 +438,28 @@ app.get('/delete', (req, res) => {
         layout: 'logged',
     });
 });
-
+// This is the account deletion
 app.post('/delete', async (req, res) => {
     const { email, password } = req.body;
     try {
         const AttemptLog = await db.logAttempt(email);
         const match = await compare(password, AttemptLog.rows[0].password);
         console.log(match);
+        const user_id = req.session.userID;
+        console.log(user_id);
         if (match) {
-            const user_id = req.session.userID;
-            await db.superDelete(user_id);
-            req.session.userID = uuidv4();
-            req.session = null;
-            setTimeout(() => {
-                res.redirect('/');
-            }, 1000);
+            const confirm = await Promise.all([
+                db.superDelete1(user_id),
+                db.superDelete2(user_id),
+                db.superDelete3(user_id),
+            ]);
+            if (confirm) {
+                req.session.userID = uuidv4();
+                req.session = null;
+                setTimeout(() => {
+                    res.redirect('/');
+                }, 1000);
+            }
         } else {
             console.log(match);
             res.render('delete', {
@@ -405,7 +479,6 @@ app.post('/delete', async (req, res) => {
         });
     }
 });
-
 // Server
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {

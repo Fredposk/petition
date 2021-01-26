@@ -78,8 +78,36 @@ WHERE LOWER(user_profiles.city) = LOWER($1)`;
     return db.query(q, params);
 };
 
-module.exports.superDelete = (userId) => {
-    const q = `DELETE FROM signatures WHERE user_id = $1;``DELETE FROM user_profiles WHERE user_id = $1;``DELETE FROM users WHERE user_id = $1;`;
+module.exports.superDelete1 = (userId) => {
+    const q = `DELETE FROM signatures WHERE user_id = $1`;
     const params = [userId];
+    return db.query(q, params);
+};
+module.exports.superDelete2 = (userId) => {
+    const q = `DELETE FROM user_profiles WHERE user_id = $1`;
+    const params = [userId];
+    return db.query(q, params);
+};
+module.exports.superDelete3 = (userId) => {
+    const q = `DELETE FROM users WHERE user_id = $1`;
+    const params = [userId];
+    return db.query(q, params);
+};
+
+module.exports.userProfileUpdate = (age, city, url, userID) => {
+    const q = `INSERT INTO user_profiles (age, city, url, user_id) VALUES ($1, $2, $3, $4) ON CONFLICT (user_id) DO UPDATE SET age = $1, city = $2, url = $3, user_id = $4`;
+    const params = [age, city, url, userID];
+    return db.query(q, params);
+};
+
+module.exports.userAccountUpdate = (
+    firstName,
+    lastName,
+    email,
+    password,
+    userID
+) => {
+    const q = `UPDATE users SET first = $1, last = $2, email = $3, password = $4 WHERE user_id = $5`;
+    const params = [firstName, lastName, email, password, userID];
     return db.query(q, params);
 };

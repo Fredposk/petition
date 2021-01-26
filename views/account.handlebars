@@ -1,22 +1,25 @@
 
 <h1>This is the account page</h1>
 
-<label for="fname" >First name:</label><br>
-  <input  type="text" class="formElement" id="fname" name="firstName"><br>
-  <label for="lname">Last Name:</label><br>
-  <input  type="text" class="formElement" id="lname" name="lastName"> <br>
-    <label for="email">Email:</label><br>
-  <input class="formElement" type="email" id="email" name="email"><br>
-  <label for="password">Password:</label><br>
-  <input placeholder="min. 6 characters" class="formElement" type="password" id="password" name="password"> <br>
+
 
 <form method="post" >
+<label for="fname" >First name:</label><br>
+  <input  type="text" class="formElement" id="fname" name="firstName" value="{{userAccountDetails.first}}"><br>
+  <label for="lname">Last Name:</label><br>
+  <input  type="text" class="formElement" value="{{userAccountDetails.last}}" id="lname" name="lastName"> <br>
+    <label for="email">Email:</label><br>
+  <input class="formElement" value="{{userAccountDetails.email}}" type="email" id="email" name="email"><br>
+  <label for="password">Password:</label><br>
+  <input placeholder="******" class="formElement" type="password" id="password" name="password"> <br>
+
+
   <label for="age">Age:</label><br>
-  <input  type="number" class="formElement" id="age" name="age"><br>
+  <input  value="{{userAccountDetails.age}}" type="number" class="formElement" id="age" name="age"><br>
   <label for="City" >City:</label><br>
-  <input  type="text" class="formElement" id="city" name="city"><br>
+  <input value="{{userAccountDetails.city}}"  type="text" class="formElement" id="city" name="city"><br>
     <label for="homepage">Home Page:</label><br>
-  <input class="formElement" type="url" id="url" name="url"><br>
+  <input value="{{userAccountDetails.url}}" class="formElement" type="url" id="url" name="url"><br>
  <br>
    <input type="hidden" name="_csrf" value="{{csrfToken}}">
 <br>
@@ -33,13 +36,12 @@
 >DELETE</a>
 
 
-
-
-{{#if hasDBErrors}}
+{{#if isUpdated}}
  <div class="flex flex-col justify-center mt-12">
   <ul class="errorEl">
-    <li>{{errors}}</li>
+    <li>{{updateMsg}}</li>
 {{/if}}
+
   </ul>
 </div>
 
