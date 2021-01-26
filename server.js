@@ -3,7 +3,13 @@ const app = express();
 const cookieSession = require('cookie-session');
 const csurf = require('csurf');
 const helmet = require('helmet');
-const secrets = require('./secrets.json');
+// const secrets = require('./secrets.json');
+let secrets;
+if (process.env.cookie_secret) {
+    secrets = process.env.cookie_secret;
+} else {
+    secrets = require('./secrets.json');
+}
 const morgan = require('morgan');
 const { v4: uuidv4 } = require('uuid');
 const db = require('./db');
@@ -171,6 +177,7 @@ app.post('/profile', async (req, res) => {
             await db.addUserDetails(age, city, url, userId);
             res.redirect('/petition');
         } catch (error) {
+            console.log(age, city, url);
             res.render('profile', {
                 layout: 'logged',
                 title: 'Profile',
@@ -184,7 +191,7 @@ app.post('/profile', async (req, res) => {
             layout: 'logged',
             title: 'Profile',
             hasErrors: true,
-            errors: 'Make Sure This is a valid URL',
+            errors: 'Make sure this is a valid URL',
         });
     }
 });
