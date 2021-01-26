@@ -1,0 +1,37 @@
+<h1>This is account delete</h1>
+
+
+
+<h2>Type your email and password to confirm account deletion</h2>
+
+
+
+<form method="post">
+     <label for="fname" class="text-gray-900">Email</label><br>
+  <input class="formElement" type="email" id="email" name="email"><br>
+  <label  for="password" class="text-gray-900">Password</label><br>
+  <input class="formElement" type="password" id="password" name="password"><br>
+  <button class="px-2 py-1 mt-3 text-sm tracking-wide text-gray-100 uppercase transition duration-500 bg-red-400 border-2 border-red-400 rounded shadow hover:bg-red-700 hover:shadow-2xl hover:text-red-400"
+ type="submit">Delete Forever</button>
+   <input type="hidden" name="_csrf" value="{{csrfToken}}">
+</form>
+
+
+
+{{#if hasPwErrors}}
+<div class="flex flex-col justify-center mt-12">
+  <ul class="errorEl">
+    <li>{{errors}}</li>
+{{/if}}
+
+
+{{#if hasUserErrors}}
+ <div class="flex flex-col justify-center mt-12">
+  <ul class="errorEl">
+    <li>{{errors}}</li>
+{{/if}}
+  </ul>
+</div>
+
+<img src="/Illustration.svg" >
+</div>

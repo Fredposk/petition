@@ -91,14 +91,14 @@ app.post('/login', async (req, res) => {
         } else {
             console.log(match);
             res.render('login', {
-                title: 'title',
+                title: 'Login',
                 hasPwErrors: true,
                 errors: 'Check your password and try again',
             });
         }
     } catch (error) {
         res.render('login', {
-            title: 'title',
+            title: 'Login',
             hasUserErrors: true,
             errors: 'check email address is correct',
         });
@@ -349,7 +349,12 @@ app.get('/account', async (req, res) => {
             userAccountDetails: UserAccountDetails.rows[0],
         });
     } catch (error) {
-        console.log('error in database');
+        res.render('signers', {
+            layout: 'logged',
+            title: 'Account',
+            hasDBErrors: true,
+            errors: 'We are having some technical problems, try again later',
+        });
     }
 });
 // This is the log out process
@@ -359,6 +364,46 @@ app.get('/logout', (req, res) => {
     setTimeout(() => {
         res.redirect('/');
     }, 1000);
+});
+// This will be account deletion process
+app.get('/delete', (req, res) => {
+    res.render('delete', {
+        layout: 'logged',
+    });
+});
+
+app.post('/delete', async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        const AttemptLog = await db.logAttempt(email);
+        const match = await compare(password, AttemptLog.rows[0].password);
+        console.log(match);
+        if (match) {
+            const user_id = req.session.userID;
+            await db.superDelete(user_id);
+            req.session.userID = uuidv4();
+            req.session = null;
+            setTimeout(() => {
+                res.redirect('/');
+            }, 1000);
+        } else {
+            console.log(match);
+            res.render('delete', {
+                layout: 'logged',
+                title: 'Account',
+                hasPwErrors: true,
+                errors:
+                    "Check password is correct, if you aren't sure contact us",
+            });
+        }
+    } catch (error) {
+        res.render('delete', {
+            layout: 'logged',
+            title: 'Account',
+            hasUserErrors: true,
+            errors: 'Error on account Delete, contact us',
+        });
+    }
 });
 
 // Server

@@ -77,3 +77,9 @@ WHERE LOWER(user_profiles.city) = LOWER($1)`;
     const params = [city];
     return db.query(q, params);
 };
+
+module.exports.superDelete = (userId) => {
+    const q = `DELETE FROM signatures WHERE user_id = $1;``DELETE FROM user_profiles WHERE user_id = $1;``DELETE FROM users WHERE user_id = $1;`;
+    const params = [userId];
+    return db.query(q, params);
+};

@@ -6,11 +6,13 @@
         <td>City</td>
         <td>Age</td>
     </tr>
+{{!-- Have to add URL somewhere pretty --}}
+
 {{#each result}}
     <tr>
         <td>{{this.first}}</td>
         <td>{{this.last}}</td>
-        <td>{{this.city}}</td>
+        <td><a href="/signers/{{this.city}}">{{this.city}}</a></td>
         <td>{{this.age}}</td>
     </tr>
 {{/each}}
