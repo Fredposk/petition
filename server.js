@@ -171,7 +171,8 @@ app.get('/profile', (req, res) => {
 });
 // This is the Post user profile page
 app.post('/profile', async (req, res) => {
-    const { age, city, url } = req.body;
+    let { age, city, url } = req.body;
+    age === '' ? (age = null) : age;
     const userId = req.session.userID;
     if (url.startsWith('https://') || url.startsWith('http://') || url === '') {
         try {
@@ -374,15 +375,13 @@ app.post('/account', async (req, res) => {
     const userID = req.session.userID;
     try {
         let { firstName, lastName, email, password, age, city, url } = req.body;
+        age === '' ? (age = null) : age;
         if (
             url.startsWith('https://') ||
             url.startsWith('http://') ||
             url === ''
         ) {
-            // console.log(firstName, lastName, email, password, age, city, url);
             if (password === '') {
-                console.log('didnt change password');
-
                 const UserAccountDetails = await db.UserAccountDetails(userID);
                 password = UserAccountDetails.rows[0].password;
                 Promise.all([
@@ -396,7 +395,6 @@ app.post('/account', async (req, res) => {
                     ),
                 ]);
             } else {
-                console.log('password changed');
                 const userID = req.session.userID;
                 const salt = await bcrypt.genSalt(10);
                 const hashPassword = await bcrypt.hash(password, salt);
@@ -459,9 +457,7 @@ app.post('/delete', async (req, res) => {
     try {
         const AttemptLog = await db.logAttempt(email);
         const match = await compare(password, AttemptLog.rows[0].password);
-        console.log(match);
         const user_id = req.session.userID;
-        console.log(user_id);
         if (match) {
             const confirm = await Promise.all([
                 db.superDelete1(user_id),
