@@ -1,11 +1,14 @@
 
 
 <img src="{{result.signature}}" alt="">
-<h1>THANK YOU {{user.first}}</h1>
-<p>You joined a total of {{total}} people fighting for change</p>
-<div>Click below to view all signers</div>
+<div class="mb-2 text-sm font-bold leading-5 text-center text-gray-800 uppercase">
+  <h1>THANK YOU {{user.first}}</h1>
+  <p>You joined a total of {{total}} people fighting for change</p>
+  <div>Click below to view all signers</div>
+</div>
 
-<a href="/signers" class="px-2 py-1 mt-3 text-sm tracking-wide text-gray-300 uppercase transition duration-500 bg-gray-500 border-2 border-gray-500 rounded shadow hover:bg-gray-700 hover:shadow-2xl hover:text-gray-400"
+
+<a href="/signers" class="px-2 py-1 mt-3 mb-2 text-sm tracking-wide text-gray-300 uppercase transition duration-500 bg-gray-500 border-2 border-gray-500 rounded shadow hover:bg-gray-700 hover:shadow-2xl hover:text-gray-400"
 >Continue</a>
 
 <form method="post">

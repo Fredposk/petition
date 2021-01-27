@@ -20,7 +20,8 @@
 </form>
 {{!-- Error handling due to user input --}}
 {{#if hasErrors}}
-<div class="flex flex-col justify-center mt-12">
+</div>
+<div class="flex flex-col items-center justify-center mt-12">
   <ul class="errorEl">
 {{#each errors}}
     <li>{{this.msg}}</li>
@@ -28,7 +29,8 @@
 {{/if}}
 {{!-- Error handling due to database --}}
 {{#if hasDBError}}
-<div class="flex flex-col justify-center mt-12">
+</div>
+<div class="flex flex-col items-center justify-center mt-12">
   <ul class="errorEl">
     <li>{{errors}}</li>
 {{/if}}

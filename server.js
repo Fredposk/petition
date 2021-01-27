@@ -1,5 +1,8 @@
 const express = require('express');
 const app = express();
+// For testing purposes
+exports.app = app;
+// For testing purposes
 const cookieSession = require('cookie-session');
 const csurf = require('csurf');
 const helmet = require('helmet');
@@ -352,22 +355,27 @@ app.get('/signers/:city', async (req, res) => {
 });
 // This wull be the user account page
 app.get('/account', async (req, res) => {
-    try {
-        const UserAccountDetails = await db.UserAccountDetails(
-            req.session.userID
-        );
-        res.render('account', {
-            layout: 'logged',
-            title: 'Account',
-            userAccountDetails: UserAccountDetails.rows[0],
-        });
-    } catch (error) {
-        res.render('signers', {
-            layout: 'logged',
-            title: 'Account',
-            hasDBErrors: true,
-            errors: 'We are having some technical problems, try again later',
-        });
+    if (!req.session.userID) {
+        res.redirect('/petition');
+    } else {
+        try {
+            const UserAccountDetails = await db.UserAccountDetails(
+                req.session.userID
+            );
+            res.render('account', {
+                layout: 'logged',
+                title: 'Account',
+                userAccountDetails: UserAccountDetails.rows[0],
+            });
+        } catch (error) {
+            res.render('signers', {
+                layout: 'logged',
+                title: 'Account',
+                hasDBErrors: true,
+                errors:
+                    'We are having some technical problems, try again later',
+            });
+        }
     }
 });
 // This is the post for account update
