@@ -1,5 +1,5 @@
 module.exports = {
-    purge: ['./views/**/*.handlebars'],
+    purge: ['./views/**/*.handlebars', './public/**/*.js'],
     darkMode: false, // or 'media' or 'class'
     theme: {
         extend: {},
