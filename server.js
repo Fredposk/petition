@@ -141,6 +141,7 @@ app.post(
             const { firstName, lastName, email } = req.body;
             const salt = await bcrypt.genSalt(10);
             const password = await bcrypt.hash(req.body.password, salt);
+            console.log(firstName, lastName, email, password);
             try {
                 const userID = await db.newUser(
                     firstName,
