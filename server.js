@@ -11,7 +11,7 @@ let secrets;
 if (process.env.cookie_secret) {
     secrets = process.env.cookie_secret;
 } else {
-    secrets = require('./secrets.json');
+    secrets = require('./secrets.json').sessionSecret;
 }
 //
 const morgan = require('morgan');
@@ -42,7 +42,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(
     cookieSession({
         name: 'session',
-        keys: [secrets.sessionSecret],
+        keys: [secrets],
         // Cookie Options 24hrs
         maxAge: 24 * 60 * 60 * 1000,
     })

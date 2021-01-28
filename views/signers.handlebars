@@ -1,24 +1,12 @@
 
-<table class="bg-gray-200">
-    <tr>
-        <td>First Name</td>
-        <td>Last Name</td>
-        <td>City</td>
-        <td>Age</td>
-    </tr>
-{{!-- Have to add URL somewhere pretty --}}
+<div class="mb-2 text-sm font-bold leading-5 text-center text-gray-800 uppercase">
+  <h1>THANK YOU Once again for joining our cause</h1>
+  <p>You joined a total of {{total}} people fighting for change</p>
+  <div>Click the city to view people from that location</div>
+  <div>If They decided to leave a link you can click their name to see it</div>
+</div>
 
-{{#each result}}
-    <tr>
-        <td>{{this.first}}</td>
-        <td>{{this.last}}</td>
-        <td><a href="/signers/{{this.city}}">{{this.city}}</a></td>
-        <td>{{this.age}}</td>
-    </tr>
-{{/each}}
-<p>{{total}}</p>
 
-</table>
 
 
 

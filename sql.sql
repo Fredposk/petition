@@ -53,9 +53,6 @@ user_id UUID NOT NULL UNIQUE REFERENCES users(user_id),
 PRIMARY KEY (profile_id)
 );
 
-insert into user_profiles (age, city, url, user_id) values (32, 'Barcelona', null ,'5dd4922f-af9c-40c9-8746-3a41782f1f09');
-
-
 SELECT           *
 FROM             users
 FULL OUTER JOIN signatures ON users.user_id = signatures.user_id
