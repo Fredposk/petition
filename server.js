@@ -1,4 +1,6 @@
 const express = require('express');
+const favicon = require('serve-favicon');
+const path = require('path');
 const app = express();
 // For testing purposes
 exports.app = app;
@@ -27,6 +29,9 @@ app.engine('handlebars', exphbs());
 app.set('view engine', 'handlebars');
 // Logging middleware
 app.use(morgan('dev'));
+
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+
 // Security middleware
 app.use(
     helmet({
