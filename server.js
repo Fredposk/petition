@@ -217,7 +217,7 @@ app.post(
     [
         check('signature', 'Field must be fully signed before moving on')
             .isDataURI()
-            .isLength('722'),
+            .isLength('3000'),
     ],
     async (req, res) => {
         const errors = validationResult(req);
