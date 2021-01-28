@@ -6,44 +6,59 @@ const useOther = async () => {
         const longitude = 13.4133;
         async function getUserStations(latitude, longitude) {
             let response = await fetch(
-                `https://v5.bvg.transport.rest/stops/nearby?latitude=${latitude}&longitude=${longitude}&results=4&distance=900`,
-                { mode: 'cors' }
+                `https://v5.bvg.transport.rest/stops/nearby?latitude=${latitude}&longitude=${longitude}&results=4&distance=700`
             );
             let data = await response.json();
+
             return data;
         }
         const results = await getUserStations(latitude, longitude);
-        results.forEach((id) => getAll(id.id));
-        async function getAll(id) {
-            async function getUserDepartures(id) {
-                let response = await fetch(
-                    `https://v5.bvg.transport.rest/stops/${id}/departures?results=1}`,
-                    { mode: 'cors' }
+        // console.log(results);
+        getIt(results);
+        function getIt(results) {
+            results.forEach((element) => {
+                getAll(element.id);
+            });
+        }
+        async function getAll(pram) {
+            let response = await fetch(
+                `https://v5.bvg.transport.rest/stops/${pram}/departures?results=2}`
+            );
+            let dataPre = await response.json();
+            let data = Array.from(new Set(dataPre));
+
+            data.forEach((element) => {
+                console.log(
+                    element.line.name,
+                    element.stop.name,
+                    new Date(element.when).toLocaleTimeString('en-US'),
+                    element.direction
                 );
-                let data = await response.json();
-                return data;
-            }
-            const [departures] = await getUserDepartures(id);
-            let time = new Date(departures.when).toLocaleTimeString('en-US');
-            let result = `<tr class='overflow-hidden'>
+                let result = `<tr class='overflow-hidden'>
                     <td class='px-1 overflow-hidden border-2 border-gray-500'>
-                        ${departures.stop.name}
+                        ${element.stop.name}
                     </td>
                     <td class='px-1 overflow-hidden border-2 border-gray-500'>
-                        ${departures.line.name}
+                        ${element.line.name}
                     </td>
                     <td class='px-1 overflow-hidden border-2 border-gray-500'>
-                        ${departures.direction}
+                        ${element.direction}
                     </td>
                     <td class='px-1 overflow-hidden border-2 border-gray-500'>
-                        ${time}
+                        ${new Date(element.when).toLocaleTimeString('en-US')}
                     </td>
                 </tr>`;
-            h1.insertAdjacentHTML('afterend', result);
+                h1.insertAdjacentHTML('afterend', result);
+            });
         }
     } catch (error) {
         console.log('error in try block');
-        return;
+        setTimeout(() => {
+            window.navigator.geolocation.getCurrentPosition(
+                successfulLookup,
+                useOther
+            );
+        }, 2000);
     }
 };
 
@@ -52,47 +67,53 @@ const successfulLookup = async (position) => {
         const { latitude, longitude } = position.coords;
         async function getUserStations(latitude, longitude) {
             let response = await fetch(
-                `https://v5.bvg.transport.rest/stops/nearby?latitude=${latitude}&longitude=${longitude}&results=4&distance=900`,
-                { mode: 'cors' }
+                `https://v5.bvg.transport.rest/stops/nearby?latitude=${latitude}&longitude=${longitude}&results=4&distance=700`
             );
             let data = await response.json();
-            if (data.length == 0) {
-                useOther();
-            }
+
             return data;
         }
         const results = await getUserStations(latitude, longitude);
-        results.forEach((id) => getAll(id.id));
-        async function getAll(id) {
-            async function getUserDepartures(id) {
-                let response = await fetch(
-                    `https://v5.bvg.transport.rest/stops/${id}/departures?results=1}`,
-                    { mode: 'cors' }
+        // console.log(results);
+        getIt(results);
+        function getIt(results) {
+            results.forEach((element) => {
+                getAll(element.id);
+            });
+        }
+        async function getAll(pram) {
+            let response = await fetch(
+                `https://v5.bvg.transport.rest/stops/${pram}/departures?results=2}`
+            );
+            let dataPre = await response.json();
+            let data = Array.from(new Set(dataPre));
+
+            data.forEach((element) => {
+                console.log(
+                    element.line.name,
+                    element.stop.name,
+                    new Date(element.when).toLocaleTimeString('en-US'),
+                    element.direction
                 );
-                let data = await response.json();
-                return data;
-            }
-            const [departures] = await getUserDepartures(id);
-            let time = new Date(departures.when).toLocaleTimeString('en-US');
-            let result = `<tr class='overflow-hidden'>
+                let result = `<tr class='overflow-hidden'>
                     <td class='px-1 overflow-hidden border-2 border-gray-500'>
-                        ${departures.stop.name}
+                        ${element.stop.name}
                     </td>
                     <td class='px-1 overflow-hidden border-2 border-gray-500'>
-                        ${departures.line.name}
+                        ${element.line.name}
                     </td>
                     <td class='px-1 overflow-hidden border-2 border-gray-500'>
-                        ${departures.direction}
+                        ${element.direction}
                     </td>
                     <td class='px-1 overflow-hidden border-2 border-gray-500'>
-                        ${time}
+                        ${new Date(element.when).toLocaleTimeString('en-US')}
                     </td>
                 </tr>`;
-            h1.insertAdjacentHTML('afterend', result);
+                h1.insertAdjacentHTML('afterend', result);
+            });
         }
     } catch (error) {
         console.log('error in try block using geolocation');
-
         setTimeout(() => {
             window.navigator.geolocation.getCurrentPosition(
                 successfulLookup,
