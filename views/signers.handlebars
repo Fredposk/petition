@@ -1,12 +1,36 @@
 
-<div class="mb-2 text-sm font-bold leading-5 text-center text-gray-800 uppercase">
-  <h1>THANK YOU Once again for joining our cause</h1>
+<div class="mb-2 space-x-2 space-y-2 text-sm font-bold leading-5 text-center text-gray-800 uppercase">
+  <h1 class="text-xl">THANK YOU Once again for joining our cause</h1>
   <p>You joined a total of {{total}} people fighting for change</p>
   <div>Click the city to view people from that location</div>
-  <div>If They decided to leave a link you can click their name to see it</div>
+
 </div>
 
+<table class="mt-3 text-sm text-center uppercase bg-blue-200 shadow-lg table-fixed ">
+        <tr id="h1" class="bg-blue-300 border-2 border-gray-500 ">
+          <td class="border-2 border-gray-500">First name<i class="ml-1 fas fa-signature"></i></td>
+          <td class="border-2 border-gray-500">Last name</td>
+          <td class="border-2 border-gray-500">age</td>
+          <td class="border-2 border-gray-500">city<i class="ml-1 fas fa-map-signs"></i></td>
 
+        </tr>
+        <tr class='overflow-hidden '>
+        {{#each result}}
+                    <td class='px-1 overflow-hidden border-2 border-gray-500'>
+                        <a href="{{this.url}}">{{this.first}}</a>
+                    </td>
+                    <td class='px-1 overflow-hidden border-2 border-gray-500'>
+                        <a href=""></a>{{this.last}}
+                    </td>
+                    <td class='px-1 overflow-hidden border-2 border-gray-500'>
+                       {{this.age}}
+                    </td>
+                   <td class="px-1 overflow-hidden border-2 border-gray-500"><a href="/signers/{{this.city}}">{{this.city}}</a></td>
+
+                </tr>
+      {{/each}}
+      </table>
+ <div class="p-3 mt-3 mb-1 space-x-2 space-y-2 text-sm font-bold leading-5 text-center text-gray-800 uppercase transition duration-500 rounded-lg hover:bg-blue-400">If They decided to leave a link you can click their name to see it</div>
 
 
 

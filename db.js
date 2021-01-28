@@ -5,7 +5,7 @@ const db = spicedPg(
 );
 
 module.exports.getSigners = () => {
-    return db.query(`SELECT users.first, users.last, user_profiles.age, user_profiles.city, user_profiles.url
+    return db.query(`SELECT users.first, users.last, user_profiles.age, user_profiles.city, user_profiles.url, signatures.signed_at
 FROM users
 LEFT JOIN signatures ON users.user_id = signatures.user_id
 LEFT JOIN user_profiles ON signatures.user_id = user_profiles.user_id`);
