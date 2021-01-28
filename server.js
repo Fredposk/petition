@@ -418,20 +418,21 @@ app.post('/account', async (req, res) => {
                 ]);
             }
         } else {
-            // This whole block is not logging, url error is on catch
-            // res.render('account', {
-            //     layout: 'logged',
-            //     isUpdated: true,
-            //     updateMsg: 'Make sure this is a valid URL',
-            //     userAccountDetails: UserAccountDetails.rows[0],
-            // });
+            const UserAccountDetails1 = await db.UserAccountDetails(userID);
+            res.render('account', {
+                layout: 'logged',
+                isUpdated: true,
+                updateMsg: 'Make sure this is a valid URL',
+                userAccountDetails: UserAccountDetails1.rows[0],
+            });
+            return;
         }
-        const UserAccountDetails = await db.UserAccountDetails(userID);
+        const UserAccountDetails1 = await db.UserAccountDetails(userID);
         res.render('account', {
             layout: 'logged',
             isUpdated: true,
             updateMsg: 'User Details have been updated',
-            userAccountDetails: UserAccountDetails.rows[0],
+            userAccountDetails: UserAccountDetails1.rows[0],
         });
     } catch (error) {
         const UserAccountDetails = await db.UserAccountDetails(userID);

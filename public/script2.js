@@ -6,18 +6,18 @@ const useOther = async () => {
         const longitude = 13.4133;
         async function getUserStations(latitude, longitude) {
             let response = await fetch(
-                `https://v5.bvg.transport.rest/stops/nearby?latitude=${latitude}&longitude=${longitude}&results=4&distance=700`,
+                `https://v5.bvg.transport.rest/stops/nearby?latitude=${latitude}&longitude=${longitude}&results=4&distance=900`,
                 { mode: 'cors' }
             );
             let data = await response.json();
             return data;
         }
         const results = await getUserStations(latitude, longitude);
-        results.map((id) => getAll(id.id));
+        results.forEach((id) => getAll(id.id));
         async function getAll(id) {
             async function getUserDepartures(id) {
                 let response = await fetch(
-                    `https://v5.bvg.transport.rest/stops/${id}/departures?results=5}`,
+                    `https://v5.bvg.transport.rest/stops/${id}/departures?results=1}`,
                     { mode: 'cors' }
                 );
                 let data = await response.json();
@@ -52,7 +52,7 @@ const successfulLookup = async (position) => {
         const { latitude, longitude } = position.coords;
         async function getUserStations(latitude, longitude) {
             let response = await fetch(
-                `https://v5.bvg.transport.rest/stops/nearby?latitude=${latitude}&longitude=${longitude}&results=4&distance=700`,
+                `https://v5.bvg.transport.rest/stops/nearby?latitude=${latitude}&longitude=${longitude}&results=4&distance=900`,
                 { mode: 'cors' }
             );
             let data = await response.json();
@@ -62,11 +62,11 @@ const successfulLookup = async (position) => {
             return data;
         }
         const results = await getUserStations(latitude, longitude);
-        results.map((id) => getAll(id.id));
+        results.forEach((id) => getAll(id.id));
         async function getAll(id) {
             async function getUserDepartures(id) {
                 let response = await fetch(
-                    `https://v5.bvg.transport.rest/stops/${id}/departures?results=5}`,
+                    `https://v5.bvg.transport.rest/stops/${id}/departures?results=1}`,
                     { mode: 'cors' }
                 );
                 let data = await response.json();
