@@ -152,6 +152,7 @@ app.post(
                 req.session.userID = userID.rows[0].user_id;
                 res.redirect('/profile');
             } catch (error) {
+                console.log(error);
                 res.render('register', {
                     title: 'Register',
                     hasDBError: true,
