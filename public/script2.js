@@ -75,6 +75,9 @@ const successfulLookup = async (position) => {
         }
         const results = await getUserStations(latitude, longitude);
         // console.log(results);
+        if (results.length == 0) {
+            useOther();
+        }
         getIt(results);
         function getIt(results) {
             results.forEach((element) => {
